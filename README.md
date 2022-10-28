@@ -26,8 +26,3 @@ Con este código hacemos que se ejecute en el puerto 4000, tambien sirve para gu
 
 if __name__ == '__main__':
     app.run(debug=True, port=4000)
-
-
-
-
-
