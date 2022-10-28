@@ -11,6 +11,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+#Diccionario de datos:
 stores = [
     {
         "name": "My Store",
@@ -23,11 +24,13 @@ stores = [
     }
 ]
 
+#SE ESTABLECE UN ENDPOINT PARA ACCEDER AL CONTENIDO DEL SERVIDOR.
+#A CONTINUACIÓN SE USA EL MÉTODO GET PARA TRAER LA INFORMACIÓN.
 @app.get("/store")
 def get_stores():
     return {"stores": stores}
 
-
+#AHORA SE USA EL MÉTODO POST:
 @app.post("/store")
 def create_store():
     request_data = request.get_json()
@@ -35,7 +38,7 @@ def create_store():
     stores.append(new_store)
     return new_store, 201
 
-
+#AHORA SE CREA UN NUEVO ENDPOINT PARA AGREGAR OBJETOS A LA COLECCIÓN:
 @app.post("/store/<string:name>/item")
 def create_item(name):
     request_data = request.get_json()
@@ -46,7 +49,7 @@ def create_item(name):
             return new_item, 201
     return {"message": "Store not found"}, 404
 
-
+#UN ENDPOINT QUE NOS MUESTRE EL CONTENIDO DE UN DOCUMENTO CON SUS ARTICULOS:
 @app.get("/store/<string:name>")
 def get_store(name):
     for store in stores:
@@ -54,7 +57,7 @@ def get_store(name):
             return store
     return {"message": "Store not found"}, 404
 
-
+#ESTE ENDPOINT NOS PERMITE VER LOS ARTICULOS DE UNA COLECCIÓN.
 @app.get("/store/<string:name>/item")
 def get_item_in_store(name):
     for store in stores:
@@ -65,4 +68,3 @@ def get_item_in_store(name):
  #CONDICIÓN PARA GUARDAR CAMBIOS EN EL SERVIDOR
 if __name__ == '__main__':
     app.run(debug=True, port=4000)
-
