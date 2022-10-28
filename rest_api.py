@@ -7,29 +7,62 @@
 #2020
 #-----------------------------
 #CREACIÓN DEL SERVIDOR LOCAL
-from flask import Flask, jsonify
+from flask import Flask, request
 
-app = Flask(__name__) 
+app = Flask(__name__)
 
-from store import stores
+stores = [
+    {
+        "name": "My Store",
+        "items": [
+            {
+                "name": "Chair",
+                "price": 15.99
+            }
+        ]
+    }
+]
 
-#FUNCIÓN DE TESTEO
-@app.route('/ping')
-def ping():
-    return jsonify({"message": "Pong!"})
+@app.get("/store")
+def get_stores():
+    return {"stores": stores}
 
-#FUNCIÓN PARA RETORNAR TODA LA LISTA DE ITEMS EN GENERAL ADICIONANDO UN MENSAJE
-@app.route('/store')
-def poststore():
-    return jsonify({"store": stores, "message": "Lista de productos"})
 
-#FUNCIÓN PARA RETORNAR SOLO UN ELEMENTO EN ESPECÍFICO
-@app.route('/store/<string:product_name>')
-def getProduct(product_name):
-    productsFound = [product for product in stores if product['name'] == product_name]
-    return jsonify({"product": productsFound[0]})
+@app.post("/store")
+def create_store():
+    request_data = request.get_json()
+    new_store = {"name": request_data["name"], "items": []}
+    stores.append(new_store)
+    return new_store, 201
 
-#CONDICIÓN PARA GUARDAR CAMBIOS EN EL SERVIDOR
+
+@app.post("/store/<string:name>/item")
+def create_item(name):
+    request_data = request.get_json()
+    for store in stores:
+        if store["name"] == name:
+            new_item = {"name": request_data["name"], "price": request_data["price"]}
+            store["items"].append(new_item)
+            return new_item, 201
+    return {"message": "Store not found"}, 404
+
+
+@app.get("/store/<string:name>")
+def get_store(name):
+    for store in stores:
+        if store["name"] == name:
+            return store
+    return {"message": "Store not found"}, 404
+
+
+@app.get("/store/<string:name>/item")
+def get_item_in_store(name):
+    for store in stores:
+        if store["name"] == name:
+            return {"items": store["items"]}
+    return {"message": "Store not found"}, 404
+    
+ #CONDICIÓN PARA GUARDAR CAMBIOS EN EL SERVIDOR
 if __name__ == '__main__':
     app.run(debug=True, port=4000)
 
